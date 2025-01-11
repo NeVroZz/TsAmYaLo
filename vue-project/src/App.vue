@@ -18,7 +18,7 @@ const logout = () => {
 
 <template>
   <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
+    <!-- <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" /> -->
 
     <div class="wrapper">
       <HelloWorld msg="Ca marche" />
@@ -27,7 +27,9 @@ const logout = () => {
       <nav>
         <router-link to="/">Home</router-link>
         <router-link to="/articles">Articles</router-link>
+        <router-link to="/favorites">Favoris</router-link>
         <!-- Affiche "Login" si déconnecté, "Logout" si connecté -->
+        <router-link v-if="isAuthenticated" to="/profile">Profil</router-link>
         <router-link v-if="!isAuthenticated" to="/login">Login</router-link>
         <button v-else @click="logout">Logout</button>
       </nav>

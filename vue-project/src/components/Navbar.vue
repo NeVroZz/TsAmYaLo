@@ -2,6 +2,7 @@
     <nav>
       <router-link to="/">Home</router-link>
       <router-link to="/articles">Articles</router-link>
+      <router-link to="/favorites">Favoris</router-link>
       <router-link v-if="!isAuthenticated" to="/login">Login</router-link>
       <button v-else @click="logout">Logout</button>
     </nav>
