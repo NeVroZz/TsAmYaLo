@@ -63,14 +63,18 @@ export const useUserStore = defineStore('user', {
       }
     },
 
-    // Mise à jour des informations utilisateur
-    async updateUser(data: { email?: string; username?: string; bio?: string; image?: string }) {
+    // Mise à jour des informations utilisateur (pseudo et bio uniquement)
+    async updateUser(data: { username?: string; bio?: string }) {
       try {
-        const response = await axios.put('/user', { user: data }, {
-          headers: {
-            Authorization: `Token ${this.token}`,
-          },
-        });
+        const response = await axios.put(
+          '/user',
+          { user: data },
+          {
+            headers: {
+              Authorization: `Token ${this.token}`,
+            },
+          }
+        );
         this.user = response.data.user; // Mise à jour des informations utilisateur
       } catch (error) {
         console.error('Erreur lors de la mise à jour du profil utilisateur :', error);
