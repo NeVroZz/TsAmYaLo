@@ -1,63 +1,89 @@
 <template>
-  <div v-if="article">
-    <h1>{{ article.title }}</h1>
-    <p>{{ article.body }}</p>
-    <button @click="toggleFavorite(article)">
-      {{ article.favorited ? 'Retirer des favoris' : 'Ajouter aux favoris' }}
-    </button>
-  </div>
-  <div v-else-if="errorMessage">
-    <p>{{ errorMessage }}</p>
-  </div>
-  <div v-else>
-    <p>Chargement des détails de l'article...</p>
+  <div>
+    <div v-if="loading">
+      <p>Chargement des détails de l'article...</p>
+    </div>
+    <div v-else-if="article">
+      <h1>{{ article.title }}</h1>
+      <p><strong>Description :</strong> {{ article.description }}</p>
+      <p><strong>Contenu :</strong> {{ article.body }}</p>
+      <button @click="toggleFavorite">
+        {{ article.favorited ? 'Retirer des favoris' : 'Ajouter aux favoris' }}
+      </button>
+    </div>
+    <div v-else>
+      <p>Aucun article trouvé pour ce slug.</p>
+    </div>
   </div>
 </template>
 
-
-
-
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
-import { useArticlesStore } from '../stores/articles';
+import { defineComponent, ref, onMounted } from "vue";
+import { useArticlesStore } from "../stores/articles";
+import { useRoute } from "vue-router";
 
 export default defineComponent({
   setup() {
-    // Variables locales
-    const route = useRoute(); // Permet de récupérer le slug depuis l'URL
-    const articlesStore = useArticlesStore(); // Store des articles
-    const article = ref<any | null>(null); // Stocke l'article chargé
-    const errorMessage = ref<string | null>(null); // Stocke un message d'erreur s'il y en a
+    const articlesStore = useArticlesStore();
+    const route = useRoute();
 
-    // Charger l'article au montage du composant
+    const article = ref(null);
+    const loading = ref(true);
+
     onMounted(async () => {
       try {
-        const slug = route.params.slug as string; // Récupération du slug dans l'URL
-        article.value = await articlesStore.fetchArticle(slug); // Charge les données de l'article
+        const slug = route.params.slug as string;
+        await articlesStore.fetchArticle(slug);
+        article.value = articlesStore.article;
       } catch (error) {
-        errorMessage.value = 'Erreur : Impossible de charger l’article.'; // Message en cas d'erreur
-        console.error('Erreur lors du chargement de l’article :', error);
+        console.error("Erreur lors du chargement des détails de l'article :", error);
+        alert("Impossible de charger l'article.");
+      } finally {
+        loading.value = false;
       }
     });
 
-    // Fonction pour gérer l'ajout ou le retrait des favoris
-    const toggleFavorite = async (article: any) => {
+    const toggleFavorite = async () => {
+      if (!article.value) return;
+
       try {
-        if (article.favorited) {
-          await articlesStore.unfavoriteArticle(article.slug); // Retirer des favoris
+        const slug = article.value.slug;
+        if (article.value.favorited) {
+          await articlesStore.unfavoriteArticle(slug);
         } else {
-          await articlesStore.favoriteArticle(article.slug); // Ajouter aux favoris
+          await articlesStore.favoriteArticle(slug);
         }
-        article.value = await articlesStore.fetchArticle(article.slug); // Recharge l'article
+        article.value = articlesStore.article; // Met à jour localement
       } catch (error) {
-        errorMessage.value = 'Erreur lors de la modification des favoris.'; // Message en cas d'erreur
-        console.error(error);
+        alert("Erreur lors de la gestion des favoris.");
       }
     };
 
-    // Retourne les données et fonctions pour le template
-    return { article, errorMessage, toggleFavorite };
+    return { article, loading, toggleFavorite };
   },
 });
 </script>
+
+<style scoped>
+h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+p {
+  margin-bottom: 1rem;
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+</style>

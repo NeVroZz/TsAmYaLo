@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from "vue-router";
 import { useUserStore } from "../stores/user";
 import ArticleList from "../views/ArticleList.vue";
 import ArticleDetail from "../views/ArticleDetail.vue";
+import ArticleCreate from "../views/ArticleCreate.vue";
+import ArticleEdit from "../views/ArticleEdit.vue";
 import Login from "../views/Login.vue";
 import Register from "../views/Register.vue";
 import Favorites from "../views/Favorites.vue";
@@ -27,15 +29,41 @@ const routes = [
     },
   },
   {
+    path: "/articles/create",
+    name: "ArticleCreate",
+    component: ArticleCreate,
+    beforeEnter: (to, from, next) => {
+      const userStore = useUserStore();
+      if (!userStore.token) {
+        alert("Vous devez être connecté pour créer un article.");
+        next("/login");
+      } else {
+        next();
+      }
+    },
+  },
+  {
     path: "/articles/:slug",
     name: "ArticleDetail",
     component: ArticleDetail,
     beforeEnter: (to, from, next) => {
       const userStore = useUserStore();
       if (!userStore.token) {
-        alert(
-          "Vous devez être connecté pour accéder aux détails de l’article."
-        );
+        alert("Vous devez être connecté pour accéder aux détails de l’article.");
+        next("/login");
+      } else {
+        next();
+      }
+    },
+  },
+  {
+    path: "/articles/:slug/edit",
+    name: "ArticleEdit",
+    component: ArticleEdit,
+    beforeEnter: (to, from, next) => {
+      const userStore = useUserStore();
+      if (!userStore.token) {
+        alert("Vous devez être connecté pour modifier un article.");
         next("/login");
       } else {
         next();
