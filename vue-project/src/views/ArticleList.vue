@@ -16,34 +16,64 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from 'vue';
-import { useArticlesStore } from '../stores/articles';
-import { useRouter } from 'vue-router';
+import { defineComponent, onMounted, computed } from "vue";
+import { useArticlesStore } from "../stores/articles";
+import { useRouter } from "vue-router";
 
 export default defineComponent({
   setup() {
     const articlesStore = useArticlesStore();
     const router = useRouter();
 
-    onMounted(() => {
-      articlesStore.fetchArticles();
+    // Charger les articles au montage
+    onMounted(async () => {
+      await articlesStore.fetchArticles();
     });
 
+    const articles = computed(() => articlesStore.articles);
+
     const deleteArticle = async (slug: string) => {
-      if (confirm('Voulez-vous vraiment supprimer cet article ?')) {
-        await articlesStore.deleteArticle(slug);
+      if (confirm("Voulez-vous vraiment supprimer cet article ?")) {
+        try {
+          await articlesStore.deleteArticle(slug); // Supprime l'article
+          alert("Article supprimé avec succès !");
+        } catch (error) {
+          alert("Erreur lors de la suppression de l'article.");
+          console.error(error);
+        }
       }
     };
 
     const goToCreate = () => {
-      router.push('/articles/create');
+      router.push("/articles/create"); // Redirige vers la page de création
     };
 
     const goToEdit = (slug: string) => {
-      router.push(`/articles/${slug}/edit`);
+      router.push(`/articles/${slug}/edit`); // Redirige vers la page d'édition
     };
 
-    return { articles: articlesStore.articles, deleteArticle, goToCreate, goToEdit };
+    return { articles, deleteArticle, goToCreate, goToEdit };
   },
 });
 </script>
+
+<style scoped>
+h1 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+button {
+  margin: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+</style>

@@ -51,6 +51,7 @@ export const useUserStore = defineStore("user", {
     // Récupération des informations utilisateur
     async fetchCurrentUser() {
       try {
+        if (!this.token) return; // Pas de token, pas besoin de récupérer l'utilisateur
         const response = await axios.get("/user", {
           headers: {
             Authorization: `Token ${this.token}`,
@@ -59,7 +60,7 @@ export const useUserStore = defineStore("user", {
         this.user = response.data.user;
       } catch (error) {
         console.error("Erreur lors de la récupération de l'utilisateur :", error);
-        throw error;
+        this.user = null; // Réinitialise l'utilisateur en cas d'erreur
       }
     },
 
