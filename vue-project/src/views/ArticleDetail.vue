@@ -20,6 +20,7 @@
         <h1>{{ article.title }}</h1>
         <p class="description"><strong>Description :</strong> {{ article.description }}</p>
         <p class="body"><strong>Contenu :</strong> {{ article.body }}</p>
+        <p class="favorites-count-small">Favoris : {{ article.favoritesCount }}</p>
         <div class="buttons">
           <button @click="toggleFavorite">
             {{ article.favorited ? "Retirer des favoris" : "Ajouter aux favoris" }}
@@ -216,6 +217,12 @@ h1 {
   font-size: 2rem;
   margin-bottom: 1rem;
   color: #ffffff;
+}
+
+.favorites-count-small {
+  font-size: 0.8rem;
+  color: #ffbf00;
+  margin-top: 1rem;
 }
 
 .description, .body {
