@@ -1,10 +1,11 @@
 <template>
   <div id="login-container">
     <div id="login-box">
+      <!-- Affiche le titre de la page en fonction de l'état de connexion -->
       <h1 v-if="!isAuthenticated">Connexion</h1>
       <h1 v-else>Bienvenue, {{ user?.username }}</h1>
 
-      <!-- Login Form -->
+      <!-- Formulaire de connexion -->
       <form v-if="!isAuthenticated" @submit.prevent="login">
         <div class="input-group">
           <label for="email">Email</label>
@@ -17,86 +18,89 @@
         <button class="action-button" type="submit">Se connecter</button>
       </form>
 
-      <!-- Logout Button -->
-      <button v-else class="action-button" @click="logout">Se déconnecter</button>
+      <!-- Bouton pour se déconnecter -->
+      <button v-else class="action-button" @click="logout">
+        Se déconnecter
+      </button>
 
-      <!-- Link to Register -->
+      <!-- Lien vers la page d'inscription -->
       <p v-if="!isAuthenticated">
-        Pas encore de compte ? <router-link to="/register">Inscrivez-vous ici</router-link>
+        Pas encore de compte ?
+        <router-link to="/register">Inscrivez-vous ici</router-link>
       </p>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue';
-import { useUserStore } from '../stores/user';
-import { useRouter } from 'vue-router';
+import { defineComponent, ref, computed } from "vue";
+import { useUserStore } from "../stores/user";
+import { useRouter } from "vue-router";
 
 export default defineComponent({
   setup() {
-    const userStore = useUserStore();
-    const router = useRouter();
-    const email = ref('');
-    const password = ref('');
+    const userStore = useUserStore(); // Store utilisateur pour gérer l'état de connexion
+    const router = useRouter(); // Permet la navigation entre les pages
+    const email = ref(""); // Stocke l'email saisi par l'utilisateur
+    const password = ref(""); // Stocke le mot de passe saisi par l'utilisateur
 
-    const isAuthenticated = computed(() => !!userStore.token); // Vérifie si l'utilisateur est connecté
-    const user = computed(() => userStore.user); // Récupère les infos utilisateur
+    // Vérifie si l'utilisateur est connecté
+    const isAuthenticated = computed(() => !!userStore.token);
 
+    // Récupère les informations de l'utilisateur connecté
+    const user = computed(() => userStore.user);
+
+    // Fonction pour gérer la connexion
     const login = async () => {
       try {
-        await userStore.login(email.value, password.value);
-        router.push('/articles'); // Redirige après connexion
+        await userStore.login(email.value, password.value); // Appelle l'action de connexion dans le store
+        router.push("/articles"); // Redirige l'utilisateur vers la liste des articles après connexion
       } catch (error) {
-        alert('Erreur lors de la connexion');
+        alert("Erreur lors de la connexion"); // Affiche un message d'erreur en cas d'échec
       }
     };
 
+    // Fonction pour gérer la déconnexion
     const logout = () => {
-      userStore.logout();
-      router.push('/login'); // Redirige vers la page de connexion
+      userStore.logout(); // Déconnecte l'utilisateur via le store
+      router.push("/login"); // Redirige vers la page de connexion
     };
 
-    return { email, password, login, logout, isAuthenticated, user };
+    return { email, password, login, logout, isAuthenticated, user }; // Expose les données et fonctions au template
   },
 });
 </script>
 
 <style scoped>
-/* Main container */
 #login-container {
   display: flex;
-  justify-content: center; /* Center horizontally */
-  align-items: center; /* Center vertically */
-  min-height: 40vh; /* Full viewport height */
-  background-color: #1e1e1e; /* Match dark theme */
-  color: #e0e0e0; /* Text color */
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #181818;
+  color: #e0e0e0;
 }
-
-/* Login box */
 #login-box {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  background-color: #2e2e2e; /* Slightly lighter background */
-  border: 1px solid #444; /* Border for separation */
-  border-radius: 8px; /* Rounded corners */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Subtle shadow */
-  padding: 2rem; /* Padding inside the box */
-  width: 400px; /* Fixed width */
-  max-width: 90%; /* Ensure it doesn't overflow smaller screens */
+  justify-content: center;
+  background-color: #2e2e2e;
+  border: 1px solid #444;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  padding: 2rem;
+  width: 400px;
+  max-width: 90%;
   text-align: center;
 }
 
-/* Heading */
 h1 {
   margin-bottom: 1.5rem;
   font-size: 1.5rem;
   color: white;
 }
 
-/* Input fields */
 .input-group {
   margin-bottom: 1rem;
   width: 100%;
@@ -125,7 +129,6 @@ input:focus {
   box-shadow: 0 0 5px rgba(0, 123, 255, 0.8);
 }
 
-/* Buttons */
 .action-button {
   padding: 0.75rem 1.5rem;
   background-color: #007bff;
@@ -151,7 +154,6 @@ input:focus {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
 
-/* Link to register */
 p {
   margin-top: 1.5rem;
   font-size: 0.9rem;

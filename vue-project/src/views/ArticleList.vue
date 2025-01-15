@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <h1>Liste des articles</h1>
+    <!-- Bouton pour naviguer vers la création d'un nouvel article -->
     <button @click="goToCreate">Créer un nouvel article</button>
 
     <!-- Champs de filtres -->
@@ -16,12 +17,17 @@
     <div class="artdiv" v-if="articles.length">
       <ul>
         <li v-for="article in articles" :key="article.slug">
-          <router-link :to="`/articles/${article.slug}`">{{ article.title }}</router-link>
+          <!-- Lien vers les détails d'un article -->
+          <router-link :to="`/articles/${article.slug}`">{{
+            article.title
+          }}</router-link>
           <p>Auteur : {{ article.author.username }}</p>
+          <!-- Bouton pour supprimer un article -->
           <button @click="deleteArticle(article.slug)">Supprimer</button>
         </li>
       </ul>
     </div>
+    <!-- Message si aucun article n'est disponible -->
     <p v-else>Aucun article disponible.</p>
   </div>
 </template>
@@ -33,23 +39,27 @@ import { useRouter } from "vue-router";
 
 export default defineComponent({
   setup() {
-    const articlesStore = useArticlesStore();
-    const router = useRouter();
+    const articlesStore = useArticlesStore(); // Store pour gérer les articles
+    const router = useRouter(); // Router pour naviguer dans l'application
 
+    // Données des filtres pour filtrer les articles
     const filters = reactive({
       author: "",
       tag: "",
       favorited: "",
     });
 
+    // Charge les articles en fonction des filtres
     const loadArticles = async () => {
       await articlesStore.fetchArticles(filters);
     };
 
+    // Applique les filtres
     const applyFilters = async () => {
       await loadArticles();
     };
 
+    // Réinitialise les filtres
     const resetFilters = async () => {
       filters.author = "";
       filters.tag = "";
@@ -57,6 +67,7 @@ export default defineComponent({
       await loadArticles();
     };
 
+    // Supprime un article et recharge la liste
     const deleteArticle = async (slug: string) => {
       if (confirm("Voulez-vous vraiment supprimer cet article ?")) {
         await articlesStore.deleteArticle(slug);
@@ -64,14 +75,16 @@ export default defineComponent({
       }
     };
 
+    // Redirige vers la page de création d'article
     const goToCreate = () => {
       router.push("/articles/create");
     };
 
+    // Charge les articles au montage du composant
     onMounted(loadArticles);
 
     return {
-      articles: computed(() => articlesStore.articles),
+      articles: computed(() => articlesStore.articles), // Liste des articles à afficher
       filters,
       applyFilters,
       resetFilters,
@@ -82,49 +95,46 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>/* Main app container */
+<style scoped>
 #app {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Horizontal centering */
-  justify-content: flex-start; /* Align content to the top */
+  align-items: center;
+  justify-content: flex-start;
   width: 100%;
-  max-width: 800px; /* Limit width for readability */
+  max-width: 800px;
   padding: 2rem;
-  background-color: #2e2e2e; /* Slightly lighter background for the app */
-  height: auto; /* Automatically adjust height to fit content */
-  border-radius: 8px; /* Optional: Rounded corners */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Optional: Subtle shadow */
+  background-color: #2e2e2e;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
 }
 
-/* Filters container */
 .filters {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center; /* Center filters horizontally */
+  justify-content: center;
   gap: 1rem;
   margin-bottom: 1.5rem;
   width: 100%;
   padding: 5px;
 }
 
-/* Articles container */
 .artdiv {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center articles horizontally */
-  justify-content: flex-start; /* Align articles from the top */
+  align-items: center;
+  justify-content: flex-start;
   width: 100%;
-  max-width: 800px; /* Limit the container width */
-  height: 50vh; /* Set a fixed height for the scrollable area */
-  overflow-y: auto; /* Enable vertical scrolling */
-  border: 1px solid #444; /* Add a border for visual separation */
+  max-width: 800px;
+  height: 50vh;
+  overflow-y: auto;
+  border: 1px solid #444;
   padding: 1rem;
-  border-radius: 8px; /* Optional: Rounded corners */
-  background-color: #1e1e1e; /* Slightly darker background for contrast */
+  border-radius: 8px;
+  background-color: #1e1e1e;
 }
 
-/* Articles list */
 ul {
   list-style: none;
   padding: 0;
@@ -132,10 +142,9 @@ ul {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 1rem; /* Add spacing between articles */
+  gap: 1rem;
 }
 
-/* Individual article */
 li {
   display: flex;
   justify-content: space-between;
@@ -144,8 +153,8 @@ li {
   border: 1px solid #ccc;
   border-radius: 4px;
   background-color: #2e2e2e;
-  width: 100%; /* Take full width of the container */
-  box-sizing: border-box; /* Include padding and border in width */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Buttons */

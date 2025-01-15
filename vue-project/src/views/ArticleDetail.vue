@@ -6,9 +6,13 @@
     <div v-else-if="article">
       <div v-if="isEditing">
         <h1>Modifier l'article</h1>
+        <!-- Formulaire pour modifier l'article -->
         <form @submit.prevent="submitUpdate" class="form">
           <input v-model="updatedTitle" placeholder="Titre" />
-          <textarea v-model="updatedDescription" placeholder="Description"></textarea>
+          <textarea
+            v-model="updatedDescription"
+            placeholder="Description"
+          ></textarea>
           <textarea v-model="updatedBody" placeholder="Contenu"></textarea>
           <div class="form-buttons">
             <button type="submit">Enregistrer les modifications</button>
@@ -17,13 +21,20 @@
         </form>
       </div>
       <div v-else>
+        <!-- Affichage des détails de l'article -->
         <h1>{{ article.title }}</h1>
-        <p class="description"><strong>Description :</strong> {{ article.description }}</p>
+        <p class="description">
+          <strong>Description :</strong> {{ article.description }}
+        </p>
         <p class="body"><strong>Contenu :</strong> {{ article.body }}</p>
-        <p class="favorites-count-small">Favoris : {{ article.favoritesCount }}</p>
+        <p class="favorites-count-small">
+          Favoris : {{ article.favoritesCount }}
+        </p>
         <div class="buttons">
           <button @click="toggleFavorite">
-            {{ article.favorited ? "Retirer des favoris" : "Ajouter aux favoris" }}
+            {{
+              article.favorited ? "Retirer des favoris" : "Ajouter aux favoris"
+            }}
           </button>
           <button @click="startEdit">Modifier l'article</button>
         </div>
@@ -31,6 +42,7 @@
 
       <section class="comments-section">
         <h2>Commentaires</h2>
+        <!-- Formulaire pour ajouter un commentaire -->
         <form @submit.prevent="submitComment" class="comment-form">
           <textarea
             v-model="newComment"
@@ -40,13 +52,22 @@
           <button type="submit">Ajouter un commentaire</button>
         </form>
 
+        <!-- Liste des commentaires -->
         <ul v-if="comments.length" class="comments-list">
-          <li v-for="comment in comments" :key="comment.id" class="comment-item">
+          <li
+            v-for="comment in comments"
+            :key="comment.id"
+            class="comment-item"
+          >
             <div class="comment-content">
               <p>{{ comment.body }}</p>
-              <small>Écrit par : {{ comment.author?.username || 'Inconnu' }}</small>
+              <small
+                >Écrit par : {{ comment.author?.username || "Inconnu" }}</small
+              >
             </div>
-            <button @click="deleteComment(comment.id)" class="delete-btn">Supprimer</button>
+            <button @click="deleteComment(comment.id)" class="delete-btn">
+              Supprimer
+            </button>
           </li>
         </ul>
         <p v-else>Aucun commentaire pour cet article.</p>
@@ -65,37 +86,38 @@ import { useRoute } from "vue-router";
 
 export default defineComponent({
   setup() {
-    const articlesStore = useArticlesStore();
-    const route = useRoute();
+    const articlesStore = useArticlesStore(); // Store des articles
+    const route = useRoute(); // Récupération des paramètres de la route
 
     const article = ref(null);
     const comments = ref([]);
     const newComment = ref("");
     const loading = ref(true);
 
-    // État pour la modification
+    // État et champs pour la modification
     const isEditing = ref(false);
     const updatedTitle = ref("");
     const updatedDescription = ref("");
     const updatedBody = ref("");
 
+    // Chargement initial de l'article et des commentaires
     onMounted(async () => {
       try {
         const slug = route.params.slug as string;
         if (!slug) throw new Error("Slug manquant");
-        console.log("Chargement de l'article avec le slug :", slug);
         await articlesStore.fetchArticle(slug);
-        await articlesStore.fetchComments(slug); // Récupérer les commentaires
+        await articlesStore.fetchComments(slug);
         article.value = articlesStore.article;
         comments.value = articlesStore.comments;
       } catch (error) {
-        console.error("Erreur lors du chargement des détails de l'article :", error);
+        console.error("Erreur lors du chargement :", error);
         alert("Impossible de charger l'article.");
       } finally {
         loading.value = false;
       }
     });
 
+    // Gestion des favoris (ajouter/retirer)
     const toggleFavorite = async () => {
       if (!article.value) return;
 
@@ -106,12 +128,13 @@ export default defineComponent({
         } else {
           await articlesStore.favoriteArticle(slug);
         }
-        article.value = articlesStore.article; // Met à jour localement
+        article.value = articlesStore.article; // Mise à jour locale
       } catch (error) {
         alert("Erreur lors de la gestion des favoris.");
       }
     };
 
+    // Activer le mode édition
     const startEdit = () => {
       if (!article.value) return;
       isEditing.value = true;
@@ -120,24 +143,16 @@ export default defineComponent({
       updatedBody.value = article.value.body;
     };
 
+    // Annuler l'édition
     const cancelEdit = () => {
       isEditing.value = false;
     };
 
+    // Soumettre les modifications
     const submitUpdate = async () => {
       try {
         const slug = article.value?.slug;
-        if (!slug) {
-          console.error("Slug manquant pour la modification.");
-          return;
-        }
-
-        console.log("Modification de l'article :", {
-          slug,
-          title: updatedTitle.value,
-          description: updatedDescription.value,
-          body: updatedBody.value,
-        });
+        if (!slug) return;
 
         await articlesStore.updateArticle(slug, {
           title: updatedTitle.value,
@@ -146,14 +161,14 @@ export default defineComponent({
         });
 
         isEditing.value = false;
-        article.value = articlesStore.article; // Recharge les données localement
+        article.value = articlesStore.article;
         alert("Article modifié avec succès !");
       } catch (error) {
-        console.error("Erreur lors de la modification de l'article :", error);
         alert("Erreur lors de la modification de l'article.");
       }
     };
 
+    // Ajouter un commentaire
     const submitComment = async () => {
       if (!newComment.value.trim()) return;
 
@@ -162,21 +177,22 @@ export default defineComponent({
         if (!slug) return;
 
         await articlesStore.addComment(slug, newComment.value);
-        comments.value = articlesStore.comments; // Met à jour localement
-        newComment.value = ""; // Réinitialise le champ de texte
+        comments.value = articlesStore.comments;
+        newComment.value = ""; // Réinitialise le champ
         alert("Commentaire ajouté avec succès !");
       } catch (error) {
         alert("Erreur lors de l'ajout du commentaire.");
       }
     };
 
+    // Supprimer un commentaire
     const deleteComment = async (commentId: number) => {
       try {
         const slug = article.value?.slug;
         if (!slug) return;
 
         await articlesStore.deleteComment(slug, commentId);
-        comments.value = articlesStore.comments; // Met à jour localement
+        comments.value = articlesStore.comments;
         alert("Commentaire supprimé avec succès !");
       } catch (error) {
         alert("Erreur lors de la suppression du commentaire.");
@@ -225,11 +241,13 @@ h1 {
   margin-top: 1rem;
 }
 
-.description, .body {
+.description,
+.body {
   margin-bottom: 1rem;
 }
 
-.buttons, .form-buttons {
+.buttons,
+.form-buttons {
   margin-top: 1rem;
 }
 

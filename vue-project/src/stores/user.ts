@@ -59,7 +59,10 @@ export const useUserStore = defineStore("user", {
         });
         this.user = response.data.user;
       } catch (error) {
-        console.error("Erreur lors de la récupération de l'utilisateur :", error);
+        console.error(
+          "Erreur lors de la récupération de l'utilisateur :",
+          error
+        );
         this.user = null; // Réinitialise l'utilisateur en cas d'erreur
       }
     },
@@ -78,7 +81,10 @@ export const useUserStore = defineStore("user", {
         );
         this.user = response.data.user;
       } catch (error) {
-        console.error("Erreur lors de la mise à jour de l'utilisateur :", error);
+        console.error(
+          "Erreur lors de la mise à jour de l'utilisateur :",
+          error
+        );
         throw error;
       }
     },

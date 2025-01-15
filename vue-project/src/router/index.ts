@@ -9,86 +9,106 @@ import Register from "../views/Register.vue";
 import Favorites from "../views/Favorites.vue";
 import Profile from "../views/Profile.vue";
 
+// Définition des routes de l'application
 const routes = [
-  { path: "/", name: "Home", component: Login },
-  { path: "/register", name: "Register", component: Register },
-  { path: "/login", name: "Login", component: Login },
-  { path: "/profile", name: "Profile", component: Profile },
+  {
+    path: "/",
+    name: "Home",
+    component: Login, // Page par défaut : connexion
+  },
+  {
+    path: "/register",
+    name: "Register",
+    component: Register, // Page d'inscription
+  },
+  {
+    path: "/login",
+    name: "Login",
+    component: Login, // Page de connexion
+  },
+  {
+    path: "/profile",
+    name: "Profile",
+    component: Profile, // Page de profil
+  },
   {
     path: "/articles",
     name: "Articles",
-    component: ArticleList,
+    component: ArticleList, // Liste des articles
     beforeEnter: (to, from, next) => {
-      const userStore = useUserStore();
+      const userStore = useUserStore(); // Vérification de l'état utilisateur
       if (!userStore.token) {
-        alert("Vous devez être connecté pour accéder aux articles.");
-        next("/login"); // Redirige si non connecté
+        alert("Vous devez être connecté pour accéder aux articles."); // Redirection si non connecté
+        next("/login");
       } else {
-        next();
+        next(); // Autorisation d'accès
       }
     },
   },
   {
     path: "/articles/create",
     name: "ArticleCreate",
-    component: ArticleCreate,
+    component: ArticleCreate, // Formulaire de création d'article
     beforeEnter: (to, from, next) => {
-      const userStore = useUserStore();
+      const userStore = useUserStore(); // Vérifie si l'utilisateur est connecté
       if (!userStore.token) {
-        alert("Vous devez être connecté pour créer un article.");
+        alert("Vous devez être connecté pour créer un article."); // Bloque l'accès si non connecté
         next("/login");
       } else {
-        next();
+        next(); // Autorise l'accès
       }
     },
   },
   {
     path: "/articles/:slug",
     name: "ArticleDetail",
-    component: ArticleDetail,
+    component: ArticleDetail, // Détails d'un article
     beforeEnter: (to, from, next) => {
-      const userStore = useUserStore();
+      const userStore = useUserStore(); // Vérifie l'état utilisateur
       if (!userStore.token) {
-        alert("Vous devez être connecté pour accéder aux détails de l’article.");
+        alert(
+          "Vous devez être connecté pour accéder aux détails de l’article."
+        ); // Bloque si non connecté
         next("/login");
       } else {
-        next();
+        next(); // Autorise l'accès
       }
     },
   },
   {
     path: "/articles/:slug/edit",
     name: "ArticleEdit",
-    component: ArticleEdit,
+    component: ArticleEdit, // Page pour modifier un article
     beforeEnter: (to, from, next) => {
-      const userStore = useUserStore();
+      const userStore = useUserStore(); // Vérification utilisateur
       if (!userStore.token) {
-        alert("Vous devez être connecté pour modifier un article.");
+        alert("Vous devez être connecté pour modifier un article."); // Bloque si non connecté
         next("/login");
       } else {
-        next();
+        next(); // Autorise l'accès
       }
     },
   },
   {
     path: "/favorites",
     name: "Favorites",
-    component: Favorites,
+    component: Favorites, // Page des favoris
     beforeEnter: (to, from, next) => {
-      const userStore = useUserStore();
+      const userStore = useUserStore(); // Vérifie si l'utilisateur est connecté
       if (!userStore.token) {
-        alert("Vous devez être connecté pour accéder aux favoris.");
+        alert("Vous devez être connecté pour accéder aux favoris."); // Bloque si non connecté
         next("/login");
       } else {
-        next();
+        next(); // Autorise l'accès
       }
     },
   },
 ];
 
+// Configuration du routeur avec l'historique Web
 const router = createRouter({
-  history: createWebHistory(),
-  routes,
+  history: createWebHistory(), // Utilisation d'un historique basé sur l'URL
+  routes, // Ajout des routes définies
 });
 
-export default router;
+export default router; // Export du routeur pour l'utiliser dans l'application
